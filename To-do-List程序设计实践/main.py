@@ -1,5 +1,5 @@
 #2020.3.12 18：30-20：45    初始化程序，打印音效，背景，花朵，尝试修图  2020.3.13 18：21 -22：19  绘制标签 ，修改鼠标
-#2020.3.14 8：41 -  9：20   10:20 - 花朵各种属性绘制以及动态减少实现
+#2020.3.14 8：41 -  9：20   10:20 - 11:13 花朵各种属性绘制以及动态减少实现
 
 import pygame
 import sys
@@ -74,8 +74,17 @@ def main():
         else:
             pygame.mouse.set_visible(True)#设置鼠标样式可见
         
-        #绘制花朵的各项血量
-
+        #绘制花朵的健康值
+        health_remain = my_gardan[0].life()
+        pygame.draw.line(screen , black , (my_gardan[0].rect.left , my_gardan[0].rect.top - 20),\
+            (my_gardan[0].rect.right , my_gardan[0].rect.top - 20), 4)
+        if health_remain > 0.2:   #健康值大于0.2，则为绿色
+            health_color = green
+        else:
+            health_color = red
+        pygame.draw.line(screen , health_color , (my_gardan[0].rect.left , my_gardan[0].rect.top - 20),\
+            (my_gardan[0].rect.left + my_gardan[0].rect.width * health_remain, my_gardan[0].rect.top - 20) , 4)
+    
         pygame.display.flip()   #刷新画面，将内存画布反转到屏幕上
         
         clock.tick(120)#设定帧率
