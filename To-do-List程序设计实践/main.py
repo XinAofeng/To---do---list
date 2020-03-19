@@ -23,13 +23,19 @@ pygame.mixer.music.load("sounds/birds_background.mp3")
 pygame.mixer.music.set_volume(0.2)
 
 #加载所有花的图片
-flower_image = []    #存放所有花的图片
 flower1_image = "images/flower_1.png"
-flower_image.append(flower1_image)
+flower2_image = "images/小房子.png"  #假设是第二朵花
+flower2_copy =  pygame.image.load("images/小房子.png")
+flower2_copy_rect = flower2_copy.get_rect() #选择主页面展示的花朵的界面里的花 
 
 #加载其他图片
 image_game = "images/game.png"  #主界面 游戏 标签
-mouse_2 ="images/mouse_2.png" #光标样式
+#mouse_2 ="images/mouse_2.png" #光标样式
+game_image = pygame.image.load("images/rural.png")
+back = pygame.image.load("images/饲料.png").convert_alpha()
+back_rect = back.get_rect()
+back = pygame.image.load("images/饲料.png").convert_alpha()
+back_rect = back.get_rect()
 
 #定义各种颜色
 black = (0 , 0 , 0)
@@ -43,48 +49,52 @@ all_speed.append(speed1)
 #加载需要花的对象
 my_gardan = []  #存放所有花的对象
 flower1 = my_flower.Flower(flower1_image , bg_size , all_speed[0])
+flower2 = my_flower.Flower(flower2_image , bg_size , all_speed[0])
 my_gardan.append(flower1)
-
+my_gardan.append(flower2)
 #设置标签位置
 location_game = game_left , game_top = 30 ,50
 
 #加载标签对象
-label_game = labels.Lable(image_game , mouse_2 ,location_game)
+label_game = labels.Lable(image_game ,location_game)
 
 def main():
+    choice = 0  #标志位，标识现在用户选择的是哪朵花
+    background_control = 0  #默认为主屏幕   
     pygame.mixer.music.play(-1) #-1表示无限循环播放，此处为背景音乐
     clock = pygame.time.Clock() 
     running = True
     
     while running:
         for event in pygame.event.get():
-            if event.type == quit:  #用户点击差差推出程序
+            if event.type == QUIT:  #用户点击差差推出程序
                 pygame.quit()
                 sys.exit()
-
-        screen.blit(background , (0 , 0))   #绘制背景，后画的会覆盖先画的
-        screen.blit(my_gardan[0].image , my_gardan[0].rect) #绘制花朵
-        screen.blit(label_game.label ,label_game.label_rect)    #绘制主界面标签
-        
-        #设置光标样式
-        label_game.mouse_rect.left , label_game.mouse_rect.top = pygame.mouse.get_pos()
-        if (label_game.check_location()):
-            pygame.mouse.set_visible(False)#设置鼠标样式不可见
-            screen.blit(label_game.mouse , label_game.mouse_rect)   #绘制鼠标
-        else:
-            pygame.mouse.set_visible(True)#设置鼠标样式可见
-        
-        #绘制花朵的健康值
-        health_remain = my_gardan[0].life()
-        pygame.draw.line(screen , black , (my_gardan[0].rect.left , my_gardan[0].rect.top - 20),\
-            (my_gardan[0].rect.right , my_gardan[0].rect.top - 20), 4)
+            elif event.type == MOUSEBUTTONDOWN:
+                if event.button == 1 and label_game.label_rect.collidepoint(event.pos):
+                    background_control = 1
+                if event.button == 1 and back_rect.collidepoint(event.pos):
+                    background_control = 0
+                if event.button == 1 and flower2_copy_rect.collidepoint(event.pos):
+                    choice = 1  #可以再补充确认键
+        health_remain = my_gardan[choice].life()
+        pygame.draw.line(screen , black , (my_gardan[choice].rect.left , my_gardan[choice].rect.top - 20),\
+            (my_gardan[choice].rect.right , my_gardan[choice].rect.top - 20), 4)
         if health_remain > 0.2:   #健康值大于0.2，则为绿色
             health_color = green
         else:
             health_color = red
-        pygame.draw.line(screen , health_color , (my_gardan[0].rect.left , my_gardan[0].rect.top - 20),\
-            (my_gardan[0].rect.left + my_gardan[0].rect.width * health_remain, my_gardan[0].rect.top - 20) , 4)
+        pygame.draw.line(screen , health_color , (my_gardan[choice].rect.left , my_gardan[choice].rect.top - 20),\
+            (my_gardan[choice].rect.left + my_gardan[choice].rect.width * health_remain, my_gardan[choice].rect.top - 20) , 4)
     
+        if background_control == 0:
+            screen.blit(background , (0 , 0))   #绘制背景，后画的会覆盖先画的
+            screen.blit(my_gardan[choice].image , my_gardan[choice].rect) #绘制花朵
+            screen.blit(label_game.label ,label_game.label_rect)    #绘制主界面标签
+        if background_control == 1:
+            screen.blit(game_image , (0 , 0))
+            screen.blit(back , (10 , 20))
+            screen.blit(flower2.image , (150 , 150))
         pygame.display.flip()   #刷新画面，将内存画布反转到屏幕上
         
         clock.tick(120)#设定帧率
@@ -97,3 +107,4 @@ if __name__ == "__main__":
         traceback.print_exc()
         pygame.quit()
         input()
+
