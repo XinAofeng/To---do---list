@@ -4,7 +4,7 @@ import traceback
 from pygame.locals import *
 import my_flower
 import labels
-
+import my_cat
 pygame.init()   #pygame初始化
 pygame.mixer.init()     #混音器初始化
 
@@ -45,6 +45,20 @@ shop_click = pygame.image.load("images/商店_点击.png").convert_alpha()
 stor_nor = pygame.image.load("images/仓库_默认.png").convert_alpha()
 stor = stor_nor #初始化
 stor_click = pygame.image.load("images/仓库_点击.png").convert_alpha()
+
+#猫的图片
+cat_image=[]    #1猫默认图标
+for i in range(4):
+    url = 'images/'+'cat_1'+str(i)+'.png'
+    img=pygame.image.load(url).convert_alpha()
+    cat_image.append(img)
+cat_show = cat_image[0] #默认的猫的surfer对象
+cat1_stand=[]   #1猫点击图标
+for i in range(2):
+    url = 'images/'+'cat1_stand_'+str(i)+'.png'
+    img=pygame.image.load(url).convert_alpha()
+    cat1_stand.append(img)
+
 #其他图片
 back = pygame.image.load("images/饲料.png").convert_alpha()
 back_rect = back.get_rect()
@@ -76,22 +90,30 @@ my_gardan.append(flower2)
 
 #设置标签位置
 location_game = game_left , game_top = 670 ,272
-location_plan = plan_left , plan_top = 800 ,460
 location_shop = plan_left , plan_top = 20 , 50
 location_stor = stor_left , stor_top = 720 , 460
+
+#设置猫的位置
+location_cat = cat_left , cat_top = 400 , 395
+
+#加载猫对象
+cat = my_cat.Cat(cat_show , location_cat)
+
 #加载标签对象
 label_game = labels.Lable(game_nor ,location_game)
-label_plan = labels.Lable(plan_nor ,location_plan)
 label_shop = labels.Lable(shop_nor ,location_shop)
 label_stor = labels.Lable(stor_nor ,location_stor)
 def main():
+    location_plan = plan_left , plan_top = 800 ,460#因为之后要修改，所以放在main里定义
     choice = 0  #标志位，标识现在用户选择的是哪朵花
     background_control = 0  #默认为主屏幕 
     pygame.mixer.music.play(-1) #-1表示无限循环播放，此处为背景音乐
+    tip=0   #设置猫的动图播放
     clock = pygame.time.Clock() 
+    cat_act = False #判断是否执行动图 
     running = True
-
     while running:
+        label_plan = labels.Lable(plan_nor ,location_plan)#因为涉及到坐标修改，所以放在后面定义
         for event in pygame.event.get():
             if event.type == QUIT:  #用户点击差差推出程序
                 pygame.quit()
@@ -110,8 +132,10 @@ def main():
                     game = game_nor
                 if label_plan.label_rect.collidepoint(event.pos):
                     plan = plan_click
+                    location_plan = plan_left , plan_top = 800 ,470
                 else:
                     plan = plan_nor
+                    location_plan = plan_left , plan_top = 800 ,460
                 if label_shop.label_rect.collidepoint(event.pos):
                     shop = shop_click
                 else:
@@ -120,9 +144,29 @@ def main():
                     stor = stor_click
                 else:
                     stor = stor_nor
+                if cat.rect.collidepoint(event.pos):
+                    cat_act = True
+                else:
+                   cat_act = False
 
-
-        
+            #让猫动起来
+        while cat_act:
+            tip=0
+            for i in range(0,2):
+                cat_show = cat1_stand[tip]
+                screen.blit(cat_show, cat.rect)
+                tip=(tip+1)%2
+                time_passed = clock.tick(5)  
+                pygame.display.flip()
+                clock.tick(60)#设定帧率
+                if i == 1:
+                    i = 0
+                if not cat_act:
+                    break
+            at_show = cat_image[0]
+            break
+        if not cat_act:
+             cat_show = cat_image[0]
         
         health_remain = my_gardan[choice].life()
         pygame.draw.line(screen , black , (my_gardan[choice].rect.left , my_gardan[choice].rect.top - 20),\
@@ -145,6 +189,7 @@ def main():
             screen.blit(water , (530 , 20))   #绘制水滴显示 
             screen.blit(sun , (430 , 20))   #绘制阳光显示
             screen.blit(fertilizer , (330 , 20))   #绘制阳光显示
+            screen.blit(cat_show, cat.rect)
             screen.blit(toy , (230 , 20))   #绘制玩具显示
             screen.blit(ticket , (130 , 20))   #绘制玩具显示
         if background_control == 1:
@@ -153,7 +198,7 @@ def main():
             screen.blit(flower2.image , (150 , 150))
         pygame.display.flip()   #刷新画面，将内存画布反转到屏幕上
         
-        clock.tick(120)#设定帧率
+        clock.tick(240)#设定帧率
 if __name__ == "__main__":
     try:
         main()
