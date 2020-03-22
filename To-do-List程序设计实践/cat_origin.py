@@ -7,14 +7,14 @@ window = pygame.display.set_mode([1000, 1000])
 # 设置窗口标题
 pygame.display.set_caption("猫咪咪")
 imglst=[]
-for i in range(4):
-    img=pygame.image.load('images/'+'xixi'+str(i)+'.png').convert_alpha()
+for i in range(3):
+    img=pygame.image.load('images/'+'cat1_stand_'+str(i)+'.png').convert_alpha()
     imglst.append(img)
 while True:
     tip=0
-    for i in range(0,4):
+    for i in range(0,3):
         window.blit(imglst[tip], (0, 0))
-        tip=(tip+1)%4
+        tip=(tip+1)%3
         time_passed = clock.tick(5)  
         pygame.display.update()
         for event in pygame.event.get():   # 遍历所有事件

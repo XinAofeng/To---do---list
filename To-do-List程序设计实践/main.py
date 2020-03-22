@@ -52,9 +52,8 @@ for i in range(4):
     url = 'images/'+'cat_1'+str(i)+'.png'
     img=pygame.image.load(url).convert_alpha()
     cat_image.append(img)
-cat_show = cat_image[0] #默认的猫的surfer对象
 cat1_stand=[]   #1猫点击图标
-for i in range(2):
+for i in range(4):
     url = 'images/'+'cat1_stand_'+str(i)+'.png'
     img=pygame.image.load(url).convert_alpha()
     cat1_stand.append(img)
@@ -70,6 +69,7 @@ sun = pygame.image.load("images/阳光.png").convert_alpha()
 toy = pygame.image.load("images/玩具.png").convert_alpha()
 fertilizer = pygame.image.load("images/肥料.png").convert_alpha()
 ticket = pygame.image.load("images/入场券.png").convert_alpha()
+house = pygame.image.load("images/猫舍.png").convert_alpha()
 
 
 #定义各种颜色
@@ -93,11 +93,6 @@ location_game = game_left , game_top = 670 ,272
 location_shop = plan_left , plan_top = 20 , 50
 location_stor = stor_left , stor_top = 720 , 460
 
-#设置猫的位置
-location_cat = cat_left , cat_top = 400 , 395
-
-#加载猫对象
-cat = my_cat.Cat(cat_show , location_cat)
 
 #加载标签对象
 label_game = labels.Lable(game_nor ,location_game)
@@ -105,15 +100,16 @@ label_shop = labels.Lable(shop_nor ,location_shop)
 label_stor = labels.Lable(stor_nor ,location_stor)
 def main():
     location_plan = plan_left , plan_top = 800 ,460#因为之后要修改，所以放在main里定义
+    location_cat = cat_left , cat_top = 400 , 395 #设置猫的位置,因为之后要修改，所以放在main里定义
     choice = 0  #标志位，标识现在用户选择的是哪朵花
     background_control = 0  #默认为主屏幕 
     pygame.mixer.music.play(-1) #-1表示无限循环播放，此处为背景音乐
-    tip=0   #设置猫的动图播放
     clock = pygame.time.Clock() 
     cat_act = False #判断是否执行动图 
     running = True
     while running:
         label_plan = labels.Lable(plan_nor ,location_plan)#因为涉及到坐标修改，所以放在后面定义
+        cat = my_cat.Cat(cat_image[0] , location_cat)#加载猫对象,因为涉及到坐标修改，所以放在后面定义
         for event in pygame.event.get():
             if event.type == QUIT:  #用户点击差差推出程序
                 pygame.quit()
@@ -148,26 +144,8 @@ def main():
                     cat_act = True
                 else:
                    cat_act = False
-
             #让猫动起来
-        while cat_act:
-            tip=0
-            for i in range(0,2):
-                cat_show = cat1_stand[tip]
-                screen.blit(cat_show, cat.rect)
-                tip=(tip+1)%2
-                time_passed = clock.tick(5)  
-                pygame.display.flip()
-                clock.tick(60)#设定帧率
-                if i == 1:
-                    i = 0
-                if not cat_act:
-                    break
-            at_show = cat_image[0]
-            break
-        if not cat_act:
-             cat_show = cat_image[0]
-        
+            
         health_remain = my_gardan[choice].life()
         pygame.draw.line(screen , black , (my_gardan[choice].rect.left , my_gardan[choice].rect.top - 20),\
             (my_gardan[choice].rect.right , my_gardan[choice].rect.top - 20), 4)
@@ -189,16 +167,27 @@ def main():
             screen.blit(water , (530 , 20))   #绘制水滴显示 
             screen.blit(sun , (430 , 20))   #绘制阳光显示
             screen.blit(fertilizer , (330 , 20))   #绘制阳光显示
-            screen.blit(cat_show, cat.rect)
             screen.blit(toy , (230 , 20))   #绘制玩具显示
             screen.blit(ticket , (130 , 20))   #绘制玩具显示
+            #screen.blit(house , (450 , 395))   #绘制玩具显示
+            if not cat_act:
+                screen.blit(cat_image[0], (400 , 435))
         if background_control == 1:
             screen.blit(game_bg , (0 , 0))
             screen.blit(back , (10 , 20))
             screen.blit(flower2.image , (150 , 150))
+
+
         pygame.display.flip()   #刷新画面，将内存画布反转到屏幕上
-        
         clock.tick(240)#设定帧率
+        if cat_act:
+            tip=0   #设置猫的动图播放 
+            for i in range(0,4):
+                screen.blit(cat1_stand[tip], (400 , 388))
+                pygame.display.update()
+                tip=(tip+1)%4
+                time_passed = clock.tick(3) 
+        
 if __name__ == "__main__":
     try:
         main()
