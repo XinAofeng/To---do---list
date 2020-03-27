@@ -5,14 +5,15 @@ from pygame.locals import *
 import my_flower
 import labels
 import my_cat
+
 pygame.init()   #pygame初始化
 pygame.mixer.init()     #混音器初始化
-
 #进行背景和标题的设置
 bg_size = width , height = 900 , 675   #根据图片尺寸设置背景尺寸
-screen = pygame.display.set_mode(bg_size)   
+Screen = pygame.display.set_mode(bg_size , 0 , 32)  
 pygame.display.set_caption("To-do-list")    #设置标题
 background = pygame.image.load("images/桌面.jpg")
+game_bg = pygame.image.load("images/rural.png").convert_alpha() #第二个游戏界面的背景
 
 #载入所有游戏背景音乐及音效音效
 pygame.mixer.music.load("sounds/birds_background.mp3")
@@ -26,11 +27,7 @@ flower2_copy_rect = flower2_copy.get_rect() #选择主页面展示的花朵的�
 flower2_copy_rect.left , flower2_copy_rect.top = 150 ,150
 
 
-#加载其他图片
-
 #游戏图片
-game_bg = pygame.image.load("images/rural.png").convert_alpha() #游戏界面的背景
-#mouse_2 ="images/mouse_2.png" #光标样式
 game_nor = pygame.image.load("images/游戏_默认.png").convert_alpha()
 game = game_nor #初始化
 game_click = pygame.image.load("images/游戏_点击.png").convert_alpha()
@@ -59,11 +56,20 @@ for i in range(4):
     img=pygame.image.load(url).convert_alpha()
     cat1_stand.append(img)
 
-#其他图片
-back = pygame.image.load("images/饲料.png").convert_alpha()
-back_rect = back.get_rect()
-back = pygame.image.load("images/饲料.png").convert_alpha()
-back_rect = back.get_rect()
+#返回图标
+back_nor = pygame.image.load("images/返回_默认.png").convert_alpha()
+back = back_nor
+back_click = pygame.image.load("images/返回_点击.png").convert_alpha()
+back_rect = back_nor.get_rect()
+back_rect.left , back_rect.top = 10 , 20
+#“疫情速览”
+words_nor = pygame.image.load("images/疫情速览_默认.png").convert_alpha()
+words = words_nor
+words_click = pygame.image.load("images/疫情速览_点击.png").convert_alpha()
+words_rect = words_nor.get_rect()
+words_rect.left , words_rect.top = 140 , 250
+board = pygame.image.load("images/木板.png").convert_alpha()
+#主界面右上角的属性图标
 money = pygame.image.load("images/金币.png").convert_alpha()
 water = pygame.image.load("images/水滴.png").convert_alpha()
 sun = pygame.image.load("images/阳光.png").convert_alpha()
@@ -94,7 +100,8 @@ location_stor = stor_left , stor_top = 720 , 460
 label_game = labels.Lable(game_nor ,location_game)
 label_shop = labels.Lable(shop_nor ,location_shop)
 label_stor = labels.Lable(stor_nor ,location_stor)
-def main():
+def main(): 
+    screen = Screen 
     location_plan = plan_left , plan_top = 800 ,460#因为之后要修改，所以放在main里定义
     location_cat = cat_left , cat_top = 400 , 395 #设置猫的位置,因为之后要修改，所以放在main里定义
     choice = 0  #标志位，标识现在用户选择的是哪朵花
@@ -103,6 +110,7 @@ def main():
     clock = pygame.time.Clock() 
     cat_act = False #判断是否执行动图 
     running = True
+    fullscreen=False    #控制是否全屏
     while running:
         label_plan = labels.Lable(plan_nor ,location_plan)#因为涉及到坐标修改，所以放在后面定义
         cat = my_cat.Cat(cat_image[0] , location_cat)#加载猫对象,因为涉及到坐标修改，所以放在后面定义
@@ -110,6 +118,13 @@ def main():
             if event.type == QUIT:  #用户点击差差推出程序
                 pygame.quit()
                 sys.exit()
+            elif event.type == KEYDOWN:
+                if event.key == K_q:
+                    fullscreen=not fullscreen
+                    if fullscreen:
+                        screen=pygame.display.set_mode(bg_size , FULLSCREEN , 32)
+                    else:
+                        screen=pygame.display.set_mode(bg_size,0,32)
             elif event.type == MOUSEBUTTONDOWN:
                 if event.button == 1 and label_game.label_rect.collidepoint(event.pos):
                     background_control = 1
@@ -140,6 +155,14 @@ def main():
                     cat_act = True
                 else:
                    cat_act = False
+                if back_rect.collidepoint(event.pos):
+                    back = back_click
+                else:
+                    back = back_nor
+                if words_rect.collidepoint(event.pos):
+                    words = words_click
+                else:
+                    words = words_nor
             #让猫动起来
             
     
@@ -156,6 +179,8 @@ def main():
             screen.blit(fertilizer , (330 , 20))   #绘制阳光显示
             screen.blit(toy , (230 , 20))   #绘制玩具显示
             screen.blit(ticket , (130 , 20))   #绘制玩具显示
+            screen.blit(board , (70 , 80))   #绘制公告栏显示
+            screen.blit(words , (135 , 245))#加载文字
             if not cat_act:
                 screen.blit(cat_image[0], (400 , 435))
         if background_control == 1:

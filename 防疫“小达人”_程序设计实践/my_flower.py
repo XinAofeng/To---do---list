@@ -1,9 +1,6 @@
 import pygame
 
 class Flower(pygame.sprite.Sprite):  #定义my_flower类，为用户自己的花朵初始化相关属性
-    sun = 100
-    water = 100
-    fertilizer = 100
     def __init__(self , flower , bg_size ):    #speed指代花朵各项属性减少速度 
         pygame.sprite.Sprite.__init__(self)
 
