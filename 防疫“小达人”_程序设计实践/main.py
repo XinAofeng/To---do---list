@@ -5,7 +5,7 @@ from pygame.locals import *
 import my_flower
 import labels
 import my_cat
-
+import news
 pygame.init()   #pygame初始化
 pygame.mixer.init()     #混音器初始化
 #进行背景和标题的设置
@@ -82,6 +82,7 @@ ticket = pygame.image.load("images/入场券.png").convert_alpha()
 black = (0 , 0 , 0)
 red = (255 , 0 ,0)
 green = (0 , 255 , 0)
+white = (255 , 255 , 255)
 
 #加载需要花的对象
 my_gardan = []  #存放所有花的对象
@@ -132,6 +133,8 @@ def main():
                     background_control = 0
                 if event.button == 1 and flower2_copy_rect.collidepoint(event.pos):
                     choice = 1  #可以再补充确认键
+                if event.button == 1 and words_rect.collidepoint(event.pos):#疫情速览界面
+                    background_control = 2
             elif event.type == MOUSEMOTION:
                 if label_game.label_rect.collidepoint(event.pos):
                     game = game_click
@@ -187,8 +190,16 @@ def main():
             screen.blit(game_bg , (0 , 0))
             screen.blit(back , (10 , 20))
             screen.blit(flower2_copy , (150 , 150))
-
-
+        if background_control == 2:
+            fontObj = pygame.font.Font('font/SuCaiJiShiKangKangTi-2.ttf',12)
+            #render方法返回Surface对象
+            textSurfaceObj = fontObj.render('Hello world!',True,white,black)
+            #get_rect()方法返回rect对象
+            textRectObj = textSurfaceObj.get_rect()
+            textRectObj.center=(200,150)
+            screen.fill(black)
+            screen.blit(textSurfaceObj , textRectObj)
+        
         pygame.display.flip()   #刷新画面，将内存画布反转到屏幕上
         clock.tick(240)#设定帧率
         if cat_act:
