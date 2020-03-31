@@ -6,6 +6,7 @@ import my_flower
 import labels
 import my_cat
 import news
+import user
 pygame.init()   #pygame初始化
 pygame.mixer.init()     #混音器初始化
 #进行背景和标题的设置
@@ -35,10 +36,6 @@ game_click = pygame.image.load("images/游戏_点击.png").convert_alpha()
 plan_nor = pygame.image.load("images/计划_默认.png").convert_alpha()
 plan = plan_nor #初始化
 plan_click = pygame.image.load("images/计划_点击.png").convert_alpha()
-#商店图片
-shop_nor = pygame.image.load("images/商店_默认.png").convert_alpha()
-shop = shop_nor #初始化
-shop_click = pygame.image.load("images/商店_点击.png").convert_alpha()
 #仓库图片
 stor_nor = pygame.image.load("images/仓库_默认.png").convert_alpha()
 stor = stor_nor #初始化
@@ -75,14 +72,22 @@ water = pygame.image.load("images/水滴.png").convert_alpha()
 sun = pygame.image.load("images/阳光.png").convert_alpha()
 toy = pygame.image.load("images/玩具.png").convert_alpha()
 fertilizer = pygame.image.load("images/肥料.png").convert_alpha()
-ticket = pygame.image.load("images/入场券.png").convert_alpha()
-
+level = pygame.image.load("images/称号.png").convert_alpha()
+#游戏内部图标
+know_nor = pygame.image.load("images/知道了_默认.png").convert_alpha()
+know_click = pygame.image.load("images/知道了_点击.png").convert_alpha()
+know_rect = know_nor.get_rect()
+know_rect.left , know_rect.top = 140 , 250
+know = know_nor
+exp_image = pygame.image.load("images/生命条.png").convert_alpha()
+exp_rect = exp_image.get_rect()
 
 #定义各种颜色
 black = (0 , 0 , 0)
 red = (255 , 0 ,0)
 green = (0 , 255 , 0)
 white = (255 , 255 , 255)
+blue = (30 , 144 , 255)
 
 #加载需要花的对象
 my_gardan = []  #存放所有花的对象
@@ -93,20 +98,23 @@ my_gardan.append(Flower2)
 
 #设置标签位置
 location_game = game_left , game_top = 670 ,272
-location_shop = plan_left , plan_top = 20 , 50
 location_stor = stor_left , stor_top = 720 , 460
 
 
 #加载标签对象
 label_game = labels.Lable(game_nor ,location_game)
-label_shop = labels.Lable(shop_nor ,location_shop)
 label_stor = labels.Lable(stor_nor ,location_stor)
+
+#加载用户对象
+User = user.User()
+
 def main(): 
     screen = Screen 
     location_plan = plan_left , plan_top = 800 ,460#因为之后要修改，所以放在main里定义
     location_cat = cat_left , cat_top = 400 , 395 #设置猫的位置,因为之后要修改，所以放在main里定义
     choice = 0  #标志位，标识现在用户选择的是哪朵花
-    background_control = 0  #默认为主屏幕 
+    background_control = 0  #默认为主屏幕
+    board_control = 0   #默认显示展板
     pygame.mixer.music.play(-1) #-1表示无限循环播放，此处为背景音乐
     clock = pygame.time.Clock() 
     cat_act = False #判断是否执行动图 
@@ -134,7 +142,9 @@ def main():
                 if event.button == 1 and flower2_copy_rect.collidepoint(event.pos):
                     choice = 1  #可以再补充确认键
                 if event.button == 1 and words_rect.collidepoint(event.pos):#疫情速览界面
-                    background_control = 2
+                    board_control = 1
+                if event.button == 1 and know_rect.collidepoint(event.pos):#疫情速览界面
+                    board_control = 0
             elif event.type == MOUSEMOTION:
                 if label_game.label_rect.collidepoint(event.pos):
                     game = game_click
@@ -146,10 +156,6 @@ def main():
                 else:
                     plan = plan_nor
                     location_plan = plan_left , plan_top = 800 ,460
-                if label_shop.label_rect.collidepoint(event.pos):
-                    shop = shop_click
-                else:
-                    shop = shop_nor
                 if label_stor.label_rect.collidepoint(event.pos):
                     stor = stor_click
                 else:
@@ -166,6 +172,10 @@ def main():
                     words = words_click
                 else:
                     words = words_nor
+                if know_rect.collidepoint(event.pos):
+                    know = know_click
+                else:
+                    know = know_nor
             #让猫动起来
             
     
@@ -174,35 +184,56 @@ def main():
             screen.blit(my_gardan[choice].image , my_gardan[choice].rect) #绘制花朵
             screen.blit(game,label_game.label_rect)    #绘制游戏标签
             screen.blit(plan,label_plan.label_rect)    #绘制计划标签
-            screen.blit(shop,label_shop.label_rect)    #绘制商店标签
             screen.blit(stor,label_stor.label_rect)    #绘制仓库标签
             screen.blit(money , (630 , 20))   #绘制金币显示 
             screen.blit(water , (530 , 20))   #绘制水滴显示 
             screen.blit(sun , (430 , 20))   #绘制阳光显示
             screen.blit(fertilizer , (330 , 20))   #绘制阳光显示
             screen.blit(toy , (230 , 20))   #绘制玩具显示
-            screen.blit(ticket , (130 , 20))   #绘制玩具显示
-            screen.blit(board , (70 , 80))   #绘制公告栏显示
-            screen.blit(words , (135 , 245))#加载文字
+            screen.blit(level , (20 , 40))   #绘制称号图标显示
+            screen.blit(exp_image , (60 , 52))   #绘制血条图标显示
+            fontObj1 = pygame.font.Font('font/SuCaiJiShiKangKangTi-2.ttf',18) #字体的大小以及型号
+            texttitle = fontObj1.render(User.title_show , True , black)#打印称号
+            titlerect = texttitle.get_rect()
+            titlerect.center = (43,23)
+            screen.blit(texttitle , titlerect)
+            textexp = fontObj1.render("经验值"+str(User.exp_scale)+"%" , True , black)#打印经验比例
+            exprect = textexp.get_rect()
+            exprect.center = (130,40)
+            screen.blit(textexp , exprect)
+            exp_width = exp_rect.width * (User.exp_scale/100) - 10    #-10是用来调整误差的
+            pygame.draw.rect(screen, blue, (65, 55, exp_width, 10), 0)#绘制蓝色经验条
+            if board_control == 0:
+                screen.blit(board , (70 , 80))   #绘制公告栏显示
+                screen.blit(words , (135 , 245))#加载文字
+            if board_control == 1:
+                #render方法返回Surface对象
+                fontObj = pygame.font.Font('font/SuCaiJiShiKangKangTi-2.ttf',24) #字体的大小以及型号
+                (data , cn_conNum , incress) = news.data()
+                textSurfaceObj1 = fontObj.render("截至%s累计确诊%s人" % (data, cn_conNum),True , black)
+                textSurfaceObj2 = fontObj.render("较昨日增长%s人" % (incress),True , black)
+                textSurfaceObj3 = fontObj.render("勤洗手，多通风，一日三餐在家中",True , black)
+                #get_rect()方法返回rect对象
+                textRectObj1 = textSurfaceObj1.get_rect()
+                textRectObj1.center=(200,150)
+                textRectObj2 = textSurfaceObj2.get_rect()
+                textRectObj2.center=(200,180)
+                textRectObj3 = textSurfaceObj2.get_rect()
+                textRectObj3.center=(120,230)
+                screen.blit(textSurfaceObj1 , textRectObj1)
+                screen.blit(textSurfaceObj2 , textRectObj2)
+                screen.blit(textSurfaceObj3 , textRectObj3)
+                screen.blit(know , know_rect)
             if not cat_act:
                 screen.blit(cat_image[0], (400 , 435))
         if background_control == 1:
             screen.blit(game_bg , (0 , 0))
             screen.blit(back , (10 , 20))
             screen.blit(flower2_copy , (150 , 150))
-        if background_control == 2:
-            fontObj = pygame.font.Font('font/SuCaiJiShiKangKangTi-2.ttf',12)
-            #render方法返回Surface对象
-            textSurfaceObj = fontObj.render('Hello world!',True,white,black)
-            #get_rect()方法返回rect对象
-            textRectObj = textSurfaceObj.get_rect()
-            textRectObj.center=(200,150)
-            screen.fill(black)
-            screen.blit(textSurfaceObj , textRectObj)
-        
+
         pygame.display.flip()   #刷新画面，将内存画布反转到屏幕上
         clock.tick(240)#设定帧率
-        if cat_act:
+        if cat_act and background_control == 0:
             tip=0   #设置猫的动图播放 
             for i in range(0,4):
                 screen.blit(cat1_stand[tip], (400 , 386))

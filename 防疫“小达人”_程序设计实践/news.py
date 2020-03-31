@@ -19,9 +19,9 @@ def data():
     data_dict=json.loads(data)  #将字符串转换为字典对象
     d = data_dict['data']   #打印键为data的内容
     history_data = d['historylist']
-    print(type(history_data)
-    return history_data
-    #for item in history_data:
-        #打印日期，国内确诊人数
-        #print(item['date'])#,item['cn_conNum'])
-        #print(item)
+    today = history_data[0]
+    yesterday = history_data[1]
+    incress = int(today['cn_conNum']) - int(yesterday['cn_conNum'])
+    #print(history_data)
+    #print("截至%s累计确诊%s" % (today['date'] , today['cn_conNum']))
+    return today['date'] , today['cn_conNum'] , incress
